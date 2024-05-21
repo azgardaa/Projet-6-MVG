@@ -1,16 +1,16 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
-// .env // .env.prod // .env.dev ${process.env.MYVARIABLE}
+require("dotenv").config();
 const app = express();
 const userRoutes = require("./routes/user");
 const booksRoutes = require("./routes/books");
 
 mongoose
-  .connect(
-    "mongodb+srv://Noah:Z9twUc36Zx36HFJp@databasemvg.ro9phdq.mongodb.net/?retryWrites=true&w=majority&appName=DatabaseMVG",
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"));
 
