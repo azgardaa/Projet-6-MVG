@@ -14,13 +14,6 @@ const bookSchema = new mongoose.Schema({
   year: { type: Number, required: true },
   genre: { type: String, required: true },
   ratings: [ratingSchema],
-  /*
-   ratings: [{
-      _id: false,
-    userId: { type: String, required: true },
-    grade: { type: Number, required: true, min: 1 }
-   }],
-  */
   averageRating: { type: Number, default: 0 },
 });
 

@@ -3,6 +3,12 @@ const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
 exports.signup = (req, res, next) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(req.body.email)) {
+    return res.status(400).json({ message: "Adresse email invalide." });
+  }
+
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
