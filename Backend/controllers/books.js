@@ -10,6 +10,7 @@ exports.createBook = (req, res, next) => {
   const book = new Book({
     ...bookObject,
     userId: req.auth.userId,
+    averageRating: 0,
     imageUrl: `${req.protocol}://${req.get("host")}/images/image${
       req.file.filename
     }`,
@@ -147,21 +148,20 @@ exports.getAllBooks = (req, res, next) => {
 
 exports.rateBook = (req, res, next) => {
   const userId = req.auth.userId;
-  const { grade } = req.body;
+  const { rating } = req.body;
 
-  if (grade < 1 || grade > 5) {
+  if (rating < 0 || rating > 5) {
     return res
       .status(400)
-      .json({ message: "La note doit être comprise entre 1 et 5." });
+      .json({ message: "La note doit être comprise entre 0 et 5." });
   }
 
-  Book.findOne({ _id: req.params.id })
+  Book.findById(req.params.id)
     .then((book) => {
       if (!book) {
         return res.status(404).json({ message: "Livre non trouvé." });
       }
 
-      // Vérifier si l'utilisateur a déjà noté le livre
       const existingRating = book.ratings.find((r) => r.userId === userId);
       if (existingRating) {
         return res
@@ -169,8 +169,8 @@ exports.rateBook = (req, res, next) => {
           .json({ message: "Vous avez déjà noté ce livre." });
       }
 
-      // Ajouter la nouvelle note
-      book.ratings.push({ userId, grade });
+      const newRating = { userId, grade: rating };
+      book.ratings.push(newRating);
 
       // Calculer la nouvelle moyenne des notes
       const totalRatings = book.ratings.length;
@@ -179,7 +179,7 @@ exports.rateBook = (req, res, next) => {
 
       book
         .save()
-        .then(() => res.status(201).json(book))
+        .then(() => res.status(200).json(book))
         .catch((error) => res.status(400).json({ error }));
     })
     .catch((error) => res.status(500).json({ error }));
