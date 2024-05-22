@@ -1,19 +1,36 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const jwtSecret = process.env.JWT_SECRET;
 
 exports.signup = (req, res, next) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const email = req.body.email;
+  const password = req.body.password;
 
-  if (!emailRegex.test(req.body.email)) {
+  if (!validator.isEmail(email)) {
     return res.status(400).json({ message: "Adresse email invalide." });
   }
 
+  if (
+    !validator.isStrongPassword(password, {
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
+    })
+  ) {
+    return res
+      .status(400)
+      .json({ message: "Le mot de passe n'est pas assez fort." });
+  }
+
   bcrypt
-    .hash(req.body.password, 10)
+    .hash(password, 10)
     .then((hash) => {
       const user = new User({
-        email: req.body.email,
+        email: validator.normalizeEmail(email), // Sanitiser l'email
         password: hash,
       });
       user
@@ -38,7 +55,7 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+            token: jwt.sign({ userId: user._id }, jwtSecret, {
               expiresIn: "24h",
             }),
           });
