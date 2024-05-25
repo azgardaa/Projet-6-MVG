@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 require("dotenv").config();
 
-const motsDePasseInterdits = process.env.MOTS_DE_PASSE_INTERDITS.split(",");
+const motsDePasseInterdits = process.env.MDP_INTERDITS.split(",");
 
 const userSchema = mongoose.Schema({
   email: {

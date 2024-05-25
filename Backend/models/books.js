@@ -14,7 +14,7 @@ const bookSchema = new mongoose.Schema({
   year: { type: Number, required: true },
   genre: { type: String, required: true },
   ratings: { type: [ratingSchema], default: [] },
-  averageRating: { type: Number, default: 0 },
+  averageRating: { type: Number },
 });
 
 const Book = mongoose.model("Book", bookSchema);
